@@ -255,6 +255,18 @@ o35bob2$bo35bob$obo6b3o15b3o6bobo$obo6bobo15bobo6bobo$bo7b3o15b3o7bob
 bo7b$8b2obo15bob2o8b$11bo15bo11b$11b2o3b2o3b2o3b2o11b$15bo2bobo2bo15b$
 16b2o3b2o!
 `))],
+  ['Pre-pulsar shuttle 58', fillSimpleMap(rleDecode(`
+#N Pre-pulsar shuttle 58
+#O Tanner Jacobi
+#C Period-58 oscillator with a 50% smaller population
+#C than the previous Snark-based record.
+#C www.conwaylife.com/wiki/Pre-pulsar_shuttle_58
+x = 25, y = 27, rule = B3/S23
+2b2obo13bob2o$2bob2o13b2obo2$3b3o13b3o$2bo2bo13bo2bo$2b2o17b2o2$2b4o
+13b4o$2bo2bo13bo2bo$3bo5bo5bo5bo$3o5b3o3b3o5b3o$o23bo4$o23bo$3o19b3o$
+3bo17bo$2bo2bo13bo2bo$2b4o13b4o2$2b2o17b2o$2bo2bo13bo2bo$3b3o13b3o2$2b
+ob2o13b2obo$2b2obo13bob2o!
+`))],
   ['line-puffer', fillSimpleMap(rleDecode(`
 #n line-puffer
 #o tim coe
