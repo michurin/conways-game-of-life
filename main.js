@@ -67,6 +67,9 @@ class LGame {
   }
 
   inverse(x, y) {
+    if (x < 0 || x >= this.widht || y < 0 || y >= this.height) {
+      return;
+    }
     const t = x + this.width * y;
     const v = this.values[t] ? 0 : 1;
     this.updateElement(t, v, v === 0 ? -1 : 1);
@@ -126,6 +129,51 @@ function fillSimpleMap(m) {
     }
     return s;
   };
+}
+
+function rleDecode(e) {
+  let x = '';
+  e.split(/\n/).forEach((l) => {
+    const v = l.trim();
+    if (!(v === '' || v.includes('#') || v.includes('='))) {
+      x += v;
+    }
+  });
+  let n = 1;
+  const p = [];
+  x.match(/(\d+|\D)/gi).forEach((c) => {
+    const d = parseInt(c, 10);
+    if (d) {
+      n = d;
+    } else {
+      for (let i = 0; i < n; ++i) {
+        p.push(c);
+      }
+      n = 1;
+    }
+  });
+  let q = [];
+  const r = [];
+  p.forEach((c) => {
+    if (c === 'o') {
+      q.push(1);
+    } else if (c === 'b') {
+      q.push(0);
+    } else {
+      r.push(q);
+      q = [];
+    }
+  });
+  let w = 0;
+  r.forEach((a) => {
+    w = w > a.length ? w : a.length;
+  });
+  r.forEach((a) => {
+    while (a.length < w) {
+      a.push(0);
+    }
+  });
+  return r;
 }
 
 function buildDigitMap(num) { // http://www.radicaleye.com/DRH/digits.html
@@ -192,6 +240,53 @@ const fillFunctions = [
     [1, 1, 0],
     [0, 1, 0],
   ])],
+  ['pre-pulsar shuttle 29 v3', fillSimpleMap(rleDecode(`
+#n pre-pulsar shuttle 29 v3
+#c a period 29 shuttle oscillator in which four pre-pulsars are hassled.
+#c www.conwaylife.com/wiki/index.php?title=pre-pulsar_shuttle_29
+x = 39, y = 39, rule = b3/s23
+16b2o3b2o16b$15bo2bobo2bo15b$11b2o3b2o3b2o3b2o11b$11bo15bo11b$8b2obo
+15bob2o8b$7bobob2o13b2obobo7b$7bobo19bobo7b$5b2o2bo19bo2b2o5b$4bo4b2o
+17b2o4bo4b$4b5o6b3o3b3o6b5o4b$8bo6bobo3bobo6bo8b$2b4o9b3o3b3o9b4o2b$2b
+o2bo27bo2bo2b3$bo7b3o15b3o7bob$obo6bobo15bobo6bobo$obo6b3o15b3o6bobo$b
+o35bob2$bo35bob$obo6b3o15b3o6bobo$obo6bobo15bobo6bobo$bo7b3o15b3o7bob
+3$2bo2bo27bo2bo2b$2b4o9b3o3b3o9b4o2b$8bo6bobo3bobo6bo8b$4b5o6b3o3b3o6b
+5o4b$4bo4b2o17b2o4bo4b$5b2o2bo19bo2b2o5b$7bobo19bobo7b$7bobob2o13b2obo
+bo7b$8b2obo15bob2o8b$11bo15bo11b$11b2o3b2o3b2o3b2o11b$15bo2bobo2bo15b$
+16b2o3b2o!
+`))],
+  ['line-puffer', fillSimpleMap(rleDecode(`
+#n line-puffer
+#o tim coe
+#c a c/2 orthogonal line-puffer of width 76
+x = 156, y = 32, rule = b3/s23
+34b3o27b3o13b3o27b3o43b$33bo3bo25bo3bo11bo3bo25bo3bo42b$32b2o4bo11bo
+11bo4b2o9b2o4bo11bo11bo4b2o41b$31bobob2ob2o3b4ob2ob2ob4o3b2ob2obobo7bo
+bob2ob2o3b4ob2ob2ob4o3b2ob2obobo40b$30b2obo4bob2ob4o7b4ob2obo4bob2o5b
+2obo4bob2ob4o7b4ob2obo4bob2o39b$29bo4bo3bo4bo2b2obobob2o2bo4bo3bo4bo3b
+o4bo3bo4bo2b2obobob2o2bo4bo3bo4bo38b$6bo17bo16bo4bo7bo4bo27bo4bo7bo4bo
+25bo17bo6b$5b3o15b3o3b2o7b2o6bo7bo6b2o7b2o3b2o7b2o6bo7bo6b2o7b2o12b3o
+15b3o5b$3b2ob3o13b3ob2o100b2ob3o13b3ob2o3b$4bo2bob2o4bo4b2obo2bo18b2o
+7b2o35b2o7b2o27bo2bob2o4bo4b2obo2bo4b$b2obo4bobob2ob2obobo4bob2o17bo5b
+o39bo5bo26b2obo4bobob2ob2obobo4bob2ob$b2obobo2bobo7bobo2bobob2o15bo2bo
+3bo2bo35bo2bo3bo2bo24b2obobo2bobo7bobo2bobob2ob$bo8b3obobob3o8bo16bo2b
+obo2bo37bo2bobo2bo25bo8b3obobob3o8bob$2o7b2o9b2o7b3obo15bobo43bobo24bo
+b3o7b2o9b2o7b2o$33b2o12bobobobo39bobobobo21b2o33b$31b2obo11b2obobob2o
+37b2obobob2o20bob2o31b$34b2o9bo3bobo3bo35bo3bobo3bo18b2o34b$33bo88bo
+33b$35b3o7b2ob2ob2ob2o35b2ob2ob2ob2o16b3o35b$7b3o15b3o9b2o78b2o9b3o15b
+3o7b$6bo3bo13bo3bo9bo7bo3bo3bo37bo3bo3bo16bo9bo3bo13bo3bo6b$5b2o4bo11b
+o4b2o8b2o6bo3bo3bo7b3o9b3o9b3o3bo3bo3bo4b3o8b2o8b2o4bo11bo4b2o5b$4bobo
+b2ob2o3b3o3b2ob2obobo8bo21bo3bo7bo3bo7bo3bo14bo3bo7bo8bobob2ob2o3b3o3b
+2ob2obobo4b$3b2obo4bob2ob3ob2obo4bob2o6bobo5b2o5b2o5b2o3b2o5b2o3b2o5b
+2o3b2o5b2o5b2o3b2o5bobo6b2obo4bob2ob3ob2obo4bob2o3b$2bo4bo3bo4bobo4bo
+3bo4bo6b3o3b4o3b4o3b2obobob2o3b2obobob2o3b2obobob2o3b4o3b2obobob2o3b3o
+6bo4bo3bo4bobo4bo3bo4bo2b$14bo5bo20b2ob2o2b2ob2o2b2ob2ob2ob2ob2ob2ob2o
+b2ob2ob2ob2ob2ob2ob2o2b2ob2ob2ob2ob2ob2o20bo5bo14b$2b2o7b2o9b2o7b2ob3o
+5bobo4bobo4bobo3bobo3bobo3bobo3bobo3bobo3bobo4bobo3bobo3bobo5b3ob2o7b
+2o9b2o7b2o2b$36bo82bo36b$34bo6b2ob2o2b2ob2o2b2ob2ob2ob2ob2ob2ob2ob2ob
+2ob2ob2ob2ob2ob2o2b2ob2ob2ob2ob2ob2o6bo34b$34bob2o80b2obo34b$39b78o39b
+$38bo78bo!
+`))],
   ['41140732', fillSimpleMap(buildDigitMap('41140732'))],
   ['90', fillSimpleMap(buildDigitMap('90'))],
   ['3207', fillSimpleMap(buildDigitMap('3207'))],
