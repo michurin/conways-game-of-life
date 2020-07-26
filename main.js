@@ -111,23 +111,52 @@ class LGame {
 
 // ----------------------------------------------------------------------
 
-function fillSimpleMap(m) {
+function fillSimpleMap(p, m) {
   return (w, h) => {
     let x;
     let y;
-    const s = [];
-    const mw = m[0].length;
-    const mh = m.length;
-    const xo = Math.floor((w - mw) / 2);
-    const yo = Math.floor((h - mh) / 2);
+    const o = [];
+    const mw = m[0].length; // map width
+    const mh = m.length; // map height
+    const rx = w - mw; // room x
+    const ry = h - mh; // room y
+    const rs = rx < ry ? rx : ry; // room square
+    const sx = Math.floor((rx - rs) / 2); // square corner x
+    const sy = Math.floor((ry - rs) / 2); // square corner y
+    let xo = Math.floor(rx / 2); // default: center
+    let yo = Math.floor(ry / 2);
+    if (p.top !== undefined) {
+      yo = p.top;
+      if (p.sq) {
+        yo += sy;
+      }
+    }
+    if (p.bottom !== undefined) {
+      yo = ry - p.bottom;
+      if (p.sq) {
+        yo -= sy;
+      }
+    }
+    if (p.left !== undefined) {
+      xo = p.left;
+      if (p.sq) {
+        xo += sx;
+      }
+    }
+    if (p.right !== undefined) {
+      xo = rx - p.right;
+      if (p.sq) {
+        xo -= sx;
+      }
+    }
     for (y = 0; y < mh; ++y) {
       for (x = 0; x < mw; ++x) {
         if (m[y][x]) {
-          s.push({ x: x + xo, y: y + yo });
+          o.push({ x: x + xo, y: y + yo });
         }
       }
     }
-    return s;
+    return o;
   };
 }
 
@@ -230,17 +259,17 @@ const fillFunctions = [
     }
     return s;
   }],
-  ['glider', fillSimpleMap([
+  ['glider', fillSimpleMap({ top: 0, left: 0, sq: true }, [
     [0, 1, 0],
     [0, 0, 1],
     [1, 1, 1],
   ])],
-  ['F', fillSimpleMap([
+  ['F', fillSimpleMap({}, [
     [0, 1, 1],
     [1, 1, 0],
     [0, 1, 0],
   ])],
-  ['pre-pulsar shuttle 29 v3', fillSimpleMap(rleDecode(`
+  ['pre-pulsar shuttle 29 v3', fillSimpleMap({}, rleDecode(`
 #n pre-pulsar shuttle 29 v3
 #c a period 29 shuttle oscillator in which four pre-pulsars are hassled.
 #c www.conwaylife.com/wiki/index.php?title=pre-pulsar_shuttle_29
@@ -255,7 +284,7 @@ o35bob2$bo35bob$obo6b3o15b3o6bobo$obo6bobo15bobo6bobo$bo7b3o15b3o7bob
 bo7b$8b2obo15bob2o8b$11bo15bo11b$11b2o3b2o3b2o3b2o11b$15bo2bobo2bo15b$
 16b2o3b2o!
 `))],
-  ['Pre-pulsar shuttle 58', fillSimpleMap(rleDecode(`
+  ['Pre-pulsar shuttle 58', fillSimpleMap({}, rleDecode(`
 #N Pre-pulsar shuttle 58
 #O Tanner Jacobi
 #C Period-58 oscillator with a 50% smaller population
@@ -267,7 +296,7 @@ x = 25, y = 27, rule = B3/S23
 3bo17bo$2bo2bo13bo2bo$2b4o13b4o2$2b2o17b2o$2bo2bo13bo2bo$3b3o13b3o2$2b
 ob2o13b2obo$2b2obo13bob2o!
 `))],
-  ['line-puffer', fillSimpleMap(rleDecode(`
+  ['line-puffer', fillSimpleMap({ bottom: 50 }, rleDecode(`
 #n line-puffer
 #o tim coe
 #c a c/2 orthogonal line-puffer of width 76
@@ -299,12 +328,49 @@ b2ob2ob2ob2ob2ob2ob2o2b2ob2ob2ob2ob2ob2o20bo5bo14b$2b2o7b2o9b2o7b2ob3o
 2ob2ob2ob2ob2ob2o2b2ob2ob2ob2ob2ob2o6bo34b$34bob2o80b2obo34b$39b78o39b
 $38bo78bo!
 `))],
-  ['41140732', fillSimpleMap(buildDigitMap('41140732'))],
-  ['90', fillSimpleMap(buildDigitMap('90'))],
-  ['3207', fillSimpleMap(buildDigitMap('3207'))],
-  ['94174', fillSimpleMap(buildDigitMap('94174'))],
-  ['185598100297311043114', fillSimpleMap(buildDigitMap('185598100297311043114'))],
-  ['1415073111111103975114', fillSimpleMap(buildDigitMap('1415073111111103975114'))],
+  ['light speed oscillator 3', fillSimpleMap({}, rleDecode(`
+#n light speed oscillator 3
+#o josh ball
+#c a period 5 extensible oscillator.
+#c www.conwaylife.com/wiki/light_speed_oscillator_3
+x = 73, y = 73, rule = b3/s23
+61bo11b$59b3o11b$56bobo3b2o9b$54b3ob4o2bob2o5b$53bo7bob2obo6b$52bob5ob
+o2bo2bo2bo3b$14b2o36b2o3bob2o2bobob3o3b$14b2o34b2o3bo8bobo6b$49bobob2o
+bo8bo2b2o3b$14b4o3b2o26bo2bobobo5bo3b3obo2b$14bo3bo2bo28bobo2b2o4bobo
+6bo2b$17bobobo29bo2b2o6bo5b2ob2o$17b3obobo22b2o6b3o9b2obobob$19bob2obo
+21bobo5b2o10bo2bobob$6b2ob2o7bo5bo23bo2b2o14bob2o2b$6b2obo7b2ob5ob2o
+17bo2b5o13b2o5b$9bo16b2o17b3o4bo7bob3o2bob2o2b$9bob2o2bo4bob3o5bo2bo2b
+o2bo2bo5bo2bo7b4o2bobobo3b$10bobob2o3bo5b23obo9b3ob2o2bobo3b$11b3o4bo
+6bo25bo12bobobo4b$15bobo4bo3bo2b3o2b3o2b3o2b5o2b2o3b3o3b2o2b2o5b$9b5ob
+o6bo3b2o3b2o3b2o3b2o4bo4b2obob2o2bo2b2o7b$9bo3bobobo2b2o2b3o2b3o2b3o2b
+3o2b5o8bo4bo2bo7b$12bo2bobo6bo29bo2bo5b2o8b$13b3obo4b2ob23o2bobo2bob3o
+13b$18b2o2bobo2bo2bo2bo2bo2bo2bo2bo2bob3obobo3bo12b$15b2obob3obo23bobo
+bobobo2b2o12b$15b2obo2bo2b2o21b2obobobob2o15b$18bo5bo23bobobobo18b$18b
+obobobo23bo5bo18b$17b2obobob2o21b2o2bo2b2o17b$18bob3obo23bob3obo18b$
+18bo2bo2bo23bobobobo18b$17b2o5b2o21b2obobob2o17b$18bobobobo23bo5bo18b$
+18bobobobo23bo2bo2bo18b$17b2ob3ob2o21b2ob3ob2o17b$18bo2bo2bo23bobobobo
+18b$18bo5bo23bobobobo18b$17b2obobob2o21b2o5b2o17b$18bobobobo23bo2bo2bo
+18b$18bob3obo23bob3obo18b$17b2o2bo2b2o21b2obobob2o17b$18bo5bo23bobobob
+o18b$18bobobobo23bo5bo18b$15b2obobobob2o21b2o2bo2bob2o15b$12b2o2bobobo
+bobo23bob3obob2o15b$12bo3bobob3obo2bo2bo2bo2bo2bo2bo2bo2bobo2b2o18b$
+13b3obo2bobo2b23ob2o4bob3o13b$8b2o5bo2bo29bo6bobo2bo12b$7bo2bo4bo8b5o
+2b3o2b3o2b3o2b3o2b2o2bobobo3bo9b$7b2o2bo2b2obob2o4bo4b2o3b2o3b2o3b2o3b
+o6bob5o9b$5b2o2b2o3b3o3b2o2b5o2b3o2b3o2b3o2bo3bo4bobo15b$4bobobo12bo
+25bo6bo4b3o11b$3bobo2b2ob3o9bob23o5bo3b2obobo10b$3bobobo2b4o7bo2bo5bo
+2bo2bo2bo2bo5b3obo4bo2b2obo9b$2b2obo2b3obo7bo4b3o17b2o16bo9b$5b2o13b5o
+2bo17b2ob5ob2o7bob2o6b$2b2obo14b2o2bo23bo5bo7b2ob2o6b$bobo2bo10b2o5bob
+o21bob2obo19b$bobob2o9b3o6b2o22bobob3o17b$2ob2o5bo6b2o2bo29bobobo17b$
+2bo6bobo4b2o2bobo28bo2bo3bo14b$2bob3o3bo5bobobo2bo26b2o3b4o14b$3b2o2bo
+8bob2obobo49b$6bobo8bo3b2o34b2o14b$3b3obobo2b2obo3b2o36b2o14b$3bo2bo2b
+o2bob5obo52b$6bob2obo7bo53b$5b2obo2b4ob3o54b$9b2o3bobo56b$11b3o59b$11b
+o!
+`))],
+  ['41140732', fillSimpleMap({ bottom: 48, right: 4, sq: true }, buildDigitMap('41140732'))],
+  ['90', fillSimpleMap({ bottom: 5, right: 3, sq: true }, buildDigitMap('90'))],
+  ['3207', fillSimpleMap({ top: 7 }, buildDigitMap('3207'))],
+  ['94174', fillSimpleMap({ right: 3 }, buildDigitMap('94174'))],
+  ['185598100297311043114', fillSimpleMap({ bottom: 11 }, buildDigitMap('185598100297311043114'))],
+  ['1415073111111103975114', fillSimpleMap({}, buildDigitMap('1415073111111103975114'))],
 ];
 
 function lifeMap(w, h) {
