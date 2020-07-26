@@ -10,24 +10,27 @@
   <body bgcolor="#333333">
     <canvas id="grid"></canvas>
     <div id="body">
+      <small id="stat">(stat)</small>
       <h1>Controls</h1>
-      <button id="ctl_start">start ▸▸</button>
+      <button id="ctl_start">RUN ▸▸</button>
       <button id="ctl_stop">stop</button>
       <button id="ctl_step">one step</button>
-      <button id="ctl_p_clear">clear</button>
+      <button id="ctl_clear">clear</button>
       <h1>Settings</h1>
       <h2>Field size</h2>
-      <button id="ctl_fld_small">small</button>
-      <button id="ctl_fld_full_screen">full screen</button>
-      <button id="ctl_fld_double_screen">double screen</button>
+      <button data-size-x="0.5" data-size-y="0.5">small (half)</button>
+      <button data-size-x="1" data-size-y="0.7">normal</button>
+      <button data-size-x="1" data-size-y="1">full screen (scroll it)</button>
+      <button data-size-x="2" data-size-y="2">double screen (scroll it)</button>
       <h2>Cell size</h2>
-      <button id="ctl_cell_1">1x1</button>
-      <button id="ctl_cell_2">2x2</button>
-      <button id="ctl_cell_3">3x3</button>
-      <button id="ctl_cell_5">5x5</button>
-      <button id="ctl_cell_7">7x7</button>
-      <button id="ctl_cell_10">10x10</button>
-      <button id="ctl_cell_15">15x15</button>
+      <button data-cell-size="1">1x1</button>
+      <button data-cell-size="2">2x2</button>
+      <button data-cell-size="3">3x3</button>
+      <button data-cell-size="5">5x5</button>
+      <button data-cell-size="7">7x7</button>
+      <button data-cell-size="10">10x10</button>
+      <button data-cell-size="15">15x15</button>
+      <button data-cell-size="20">20x20</button>
       <h2>Delay</h2>
       <b>TODO</b>
       <h1>Presets</h1>
