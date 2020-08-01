@@ -8,7 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
     <script src="main.js"></script>
   </head>
-  <body bgcolor="#333333">
+  <body>
     <canvas id="grid"></canvas>
     <div id="body">
       <small id="stat">(stat)</small>
@@ -18,6 +18,10 @@
       <button id="ctl_step">one step</button>
       <button id="ctl_clear">clear</button>
       <h1>Settings</h1>
+      <h2>Tail mode</h2>
+      <button data-tail-mode="0">no tail</button>
+      <button data-tail-mode="1">tail</button>
+      <button data-tail-mode="2">rainbow tail</button>
       <h2>Field size</h2>
       <button data-size-x="0.5" data-size-y="0.5">small (half)</button>
       <button data-size-x="1" data-size-y="0.7">normal</button>

@@ -9,3 +9,7 @@ body {
 #body {
   margin: 20px;
 }
+
+#grid {
+  cursor: crosshair;
+}

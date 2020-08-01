@@ -296,6 +296,28 @@ x = 25, y = 27, rule = B3/S23
 3bo17bo$2bo2bo13bo2bo$2b4o13b4o2$2b2o17b2o$2bo2bo13bo2bo$3b3o13b3o2$2b
 ob2o13b2obo$2b2obo13bob2o!
 `))],
+  ['P15 pre-pulsar spaceship', fillSimpleMap({ bottom: 2 }, rleDecode(`
+#N P15 pre-pulsar spaceship
+#O Noam Elkies
+#C A period-15 c/5 orthogonal spaceship
+x = 61, y = 43, rule = b3/s23
+3b3o10b3o23b3o10b3o3b$4bobo8bobo25bobo8bobo4b$6bo8bo29bo8bo6b$bob5o6b
+5obo19bob5o6b5obob$bob2o3b2o2b2o3b2obo19bob2o3b2o2b2o3b2obob$2o5b3o2b
+3o5b2o17b2o5b3o2b3o5b2o$5b2ob2o2b2ob2o27b2ob2o2b2ob2o5b2$4bo12bo25bo
+12bo4b$5b3o6b3o27b3o6b3o5b$4b4o6b4o25b4o6b4o4b$3b2o12b2o23b2o12b2o3b$
+4bo12bo25bo12bo4b$2b3o12b3o21b3o12b3o2b$2bo16bo21bo16bo2b$5bo10bo27bo
+10bo5b$3bobo10bobo23bobo10bobo3b$2bo3b2o6b2o3bo21bo3b2o6b2o3bo2b$3bo5b
+o2bo5bo23bo5bo2bo5bo3b$9bo2bo35bo2bo9b$bob2o4bo2bo4b2obo19bob2o4bo2bo
+4b2obob$bo3b3obo2bob3o3bo19bo3b3obo2bob3o3bob$2bo6bo2bo6bo21bo6bo2bo6b
+o2b$bo2b2o3bo2bo3b2o2bo19bo2b2o3bo2bo3b2o2bob$bo2b2obobo2bobob2o2bo19b
+o2b2obobo2bobob2o2bob$5bo2bo4bo2bo27bo2bo4bo2bo5b$6bobo4bobo29bobo4bob
+o6b$27bo5bo27b$4b2obob4obob2o9bo5bo9b2obob4obob2o4b$10b2o14bobo3bobo
+14b2o10b$2bob2o10b2obo7bo5bo7bob2o10b2obo2b$2o2bo3b2o2b2o3bo2b2o5bo5bo
+5b2o2bo3b2o2b2o3bo2b2o$b2obo12bob2o19b2obo12bob2ob$3b2obo8bob2o23b2obo
+8bob2o3b$4bo2bo6bo2bo25bo2bo6bo2bo4b$b2o2bo2bo4bo2bo2b2o4b2o7b2o4b2o2b
+o2bo4bo2bo2b2ob$bo5b2o4b2o5bo5bobo3bobo5bo5b2o4b2o5bob$b3o3bo6bo3b3o6b
+o5bo6b3o3bo6bo3b3ob$3b4o8b4o23b4o8b4o3b$4bo2bo6bo2bo25bo2bo6bo2bo4b$4b
+o12bo25bo12bo4b$4bob2o6b2obo25bob2o6b2obo4b$5bo10bo27bo10bo!`))],
   ['line-puffer', fillSimpleMap({ bottom: 50 }, rleDecode(`
 #n line-puffer
 #o tim coe
@@ -416,12 +438,13 @@ function lifeMap(w, h) {
 // ----------------------------------------------------------------------
 
 class Canvas {
-  constructor(game) {
+  constructor(game, colorMgr) {
     // public
     this.width = 100;
     this.height = 100;
     this.cellStep = 2;
     // private
+    this.colorMgr = colorMgr;
     this.cellSize = 2;
     this.bdColor = '#000';
     this.bgColor = '#222';
@@ -478,8 +501,8 @@ class Canvas {
   }
 
   touch(x, y) {
-    const a = Math.floor(x / this.cellStep);
-    const b = Math.floor(y / this.cellStep);
+    const a = Math.floor((x - 1) / this.cellStep); // -1 because borders are drawn on canvas
+    const b = Math.floor((y - 1) / this.cellStep);
     const hash = a + ':' + b;
     if (hash === this.prev) {
       return;
@@ -496,10 +519,10 @@ class Canvas {
 
   step() {
     let i;
-    const t1 = new Date();
+    const t1 = performance.now();
     const [w, off, on] = this.game.step();
-    const t2 = new Date();
-    this.context.fillStyle = this.bgColor;
+    const t2 = performance.now();
+    this.context.fillStyle = this.colorMgr.setGetAndShift() || this.bgColor;
     for (i = 0; i < off.length; ++i) {
       const t = off[i];
       this.context.fillRect((t % w) * this.cellStep + 1, Math.floor(t / w) * this.cellStep + 1, this.cellSize, this.cellSize);
@@ -509,7 +532,7 @@ class Canvas {
       const t = on[i];
       this.context.fillRect((t % w) * this.cellStep + 1, Math.floor(t / w) * this.cellStep + 1, this.cellSize, this.cellSize);
     }
-    const t3 = new Date();
+    const t3 = performance.now();
     return {
       updated: off.length + on.length,
       calcTime: t2 - t1,
@@ -524,6 +547,33 @@ class Canvas {
       this.game.inverse(v.x, v.y);
       this.context.fillRect(v.x * this.cellStep + 1, v.y * this.cellStep + 1, this.cellSize, this.cellSize);
     });
+  }
+}
+
+class ColorMgr {
+  constructor() {
+    this.mode = 0;
+    this.generation = -1;
+    const p = [];
+    for (let t = 0; t < 1; t += 0.01) {
+      p.push('rgb(48,' + Math.floor(48 + 48 * (Math.sin(t * 2 * Math.PI) + 1) / 2) + ',48)');
+    }
+    this.shames = [
+      [undefined],
+      ['#343'],
+      p,
+    ];
+  }
+
+  setMode(m) {
+    this.mode = m;
+    this.generation = -1;
+  }
+
+  setGetAndShift() { // not very good idea to mix getter and mutator, but let's keep this class simple
+    const s = this.shames[this.mode];
+    this.generation = (this.generation + 1) % s.length;
+    return s[this.generation];
   }
 }
 
@@ -544,7 +594,6 @@ class Runner {
     this.statUpdated += res.updated;
     this.statCalcTime += res.calcTime;
     this.statDrawTime += res.drawTime;
-    // TODO account stat
     if (res.updated > 0) {
       this.timerId = requestAnimationFrame(() => { this.step(); });
     }
@@ -561,18 +610,29 @@ class Runner {
 }
 
 $(() => {
-  const g = new Canvas(new LGame());
+  const cmgr = new ColorMgr();
+  const g = new Canvas(new LGame(), cmgr);
   g.height = $(window).height() * 0.7;
-  g.width = $(window).width() - 15; // scroll
+  g.width = $(window).width() - 15; // scroll bar (hack)
   g.cellStep = 2;
   g.update();
   g.fill(lifeMap);
   const r = new Runner(g);
 
   setInterval(() => {
-    $('#stat').text('FPS: ' + r.statFrames + ' T: ' + (r.statCalcTime / r.statFrames) + ' / ' + (r.statDrawTime / r.statFrames) + 'ms');
+    $('#stat').html( // TODO: layout and legend
+      'FPS: ' + r.statFrames
+      + ' CPU (calc/draw/idle): ' + r.statCalcTime.toFixed(2) + ' / '
+      + r.statDrawTime.toFixed(2) + ' / '
+      + Math.max(0, Math.min(1000, (1000 - r.statCalcTime - r.statDrawTime))).toFixed(2)
+      + 'ms/s <div style="display: inline-block; background-color: #777; width: 100px; height: 10px; position: relative"><div style="position: absolute; top: 0; left: '
+      + Math.floor(r.statCalcTime / 10) + 'px; width: '
+      + Math.floor(r.statDrawTime / 10) + 'px; height: 10px; background-color: #000;"></div></div> AvgTime (calc/draw): '
+      + ((r.statCalcTime / r.statFrames) || 0).toFixed(2) + ' / '
+      + ((r.statDrawTime / r.statFrames) || 0).toFixed(2) + 'ms/frame UPS: ' + r.statUpdated + ' TPU: ' + ((1000 * r.statCalcTime / r.statUpdated) || 0).toFixed(3) + '&micro;s'
+    );
     r.statFrames = 0;
-    r.statUpdated = 0; // TODO show updated
+    r.statUpdated = 0;
     r.statCalcTime = 0;
     r.statDrawTime = 0;
   }, 1000);
@@ -598,6 +658,13 @@ $(() => {
   $('#ctl_step').click(() => { r.stop(); g.step(); });
   $('#ctl_clear').click(() => { r.stop(); g.reset(); });
 
+  $('[data-tail-mode]').each((n, v) => {
+    const e = $(v);
+    const m = parseInt(e.data('tail-mode'), 10);
+    e.click(() => {
+      cmgr.setMode(m);
+    });
+  });
   $('[data-size-x]').each((n, v) => {
     const e = $(v);
     const fx = parseFloat(e.data('size-x'));
