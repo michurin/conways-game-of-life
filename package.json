@@ -13,7 +13,7 @@
     "eslint-plugin-react-hooks": "^4.0.8"
   },
   "scripts": {
-    "test": "npx eslint main.js"
+    "test": "eslint main.js"
   },
   "author": "",
   "license": "ISC"
