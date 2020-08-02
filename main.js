@@ -68,7 +68,7 @@ class LGame {
 
   inverse(x, y) {
     if (x < 0 || x >= this.widht || y < 0 || y >= this.height) {
-      return;
+      return 0; // Hmm.. Value outside the field. There is not good result
     }
     const t = x + this.width * y;
     const v = this.values[t] ? 0 : 1;
@@ -225,7 +225,7 @@ function buildDigitMap(num) { // http://www.radicaleye.com/DRH/digits.html
   for (i = 0; i < num.length; ++i) {
     c = p[num.charAt(i)];
     for (j = 0; j < 5; ++j) {
-      m[j].push.apply(m[j], c[j]);
+      m[j].push(...c[j]);
       if (i + 1 < num.length) {
         m[j].push(0);
       }
@@ -449,7 +449,7 @@ class Canvas {
     this.bdColor = '#000';
     this.bgColor = '#222';
     this.fgColor = '#6f6';
-    this.canvas = $('#grid')[0];
+    [this.canvas] = $('#grid');
     this.context = this.canvas.getContext('2d');
     this.prev = '';
     this.game = game;
@@ -503,7 +503,7 @@ class Canvas {
   touch(x, y) {
     const a = Math.floor((x - 1) / this.cellStep); // -1 because borders are drawn on canvas
     const b = Math.floor((y - 1) / this.cellStep);
-    const hash = a + ':' + b;
+    const hash = `${a}:${b}`;
     if (hash === this.prev) {
       return;
     }
@@ -544,7 +544,9 @@ class Canvas {
     this.reset();
     this.context.fillStyle = this.fgColor;
     f(this.game.width, this.game.height).forEach((v) => {
-      this.game.inverse(v.x, v.y);
+      if (this.game.inverse(v.x, v.y) !== 1) {
+        throw new Error('Impossible. Bad example definition?');
+      }
       this.context.fillRect(v.x * this.cellStep + 1, v.y * this.cellStep + 1, this.cellSize, this.cellSize);
     });
   }
@@ -556,7 +558,7 @@ class ColorMgr {
     this.generation = -1;
     const p = [];
     for (let t = 0; t < 1; t += 0.01) {
-      p.push('rgb(48,' + Math.floor(48 + 48 * (Math.sin(t * 2 * Math.PI) + 1) / 2) + ',48)');
+      p.push(`rgb(48,${Math.floor(24 * (Math.sin(t * 2 * Math.PI) + 3))},48)`);
     }
     this.shames = [
       [undefined],
@@ -621,15 +623,15 @@ $(() => {
 
   setInterval(() => {
     $('#stat').html( // TODO: layout and legend
-      'FPS: ' + r.statFrames
-      + ' CPU (calc/draw/idle): ' + r.statCalcTime.toFixed(2) + ' / '
-      + r.statDrawTime.toFixed(2) + ' / '
-      + Math.max(0, Math.min(1000, (1000 - r.statCalcTime - r.statDrawTime))).toFixed(2)
-      + 'ms/s <div style="display: inline-block; background-color: #777; width: 100px; height: 10px; position: relative"><div style="position: absolute; top: 0; left: '
-      + Math.floor(r.statCalcTime / 10) + 'px; width: '
-      + Math.floor(r.statDrawTime / 10) + 'px; height: 10px; background-color: #000;"></div></div> AvgTime (calc/draw): '
-      + ((r.statCalcTime / r.statFrames) || 0).toFixed(2) + ' / '
-      + ((r.statDrawTime / r.statFrames) || 0).toFixed(2) + 'ms/frame UPS: ' + r.statUpdated + ' TPU: ' + ((1000 * r.statCalcTime / r.statUpdated) || 0).toFixed(3) + '&micro;s'
+      `FPS: ${r.statFrames
+      } CPU (calc/draw/idle): ${r.statCalcTime.toFixed(2)} / ${
+        r.statDrawTime.toFixed(2)} / ${
+        Math.max(0, Math.min(1000, (1000 - r.statCalcTime - r.statDrawTime))).toFixed(2)
+      }ms/s <div style="display: inline-block; background-color: #777; width: 100px; height: 10px; position: relative"><div style="position: absolute; top: 0; left: ${
+        Math.floor(r.statCalcTime / 10)}px; width: ${
+        Math.floor(r.statDrawTime / 10)}px; height: 10px; background-color: #000;"></div></div> AvgTime (calc/draw): ${
+        ((r.statCalcTime / r.statFrames) || 0).toFixed(2)} / ${
+        ((r.statDrawTime / r.statFrames) || 0).toFixed(2)}ms/frame UPS: ${r.statUpdated} TPU: ${((1000 * (r.statCalcTime / r.statUpdated)) || 0).toFixed(3)}&micro;s`
     );
     r.statFrames = 0;
     r.statUpdated = 0;
