@@ -387,6 +387,9 @@ o21bob2obo19b$bobob2o9b3o6b2o22bobob3o17b$2ob2o5bo6b2o2bo29bobobo17b$
 o2bob5obo52b$6bob2obo7bo53b$5b2obo2b4ob3o54b$9b2o3bobo56b$11b3o59b$11b
 o!
 `))],
+  ['block-laying switch engine', fillSimpleMap({ right: 46, bottom: 40, sq: true }, rleDecode('6bo$4boboo$4bobo$4bo$2bo$obo!'))],
+  ['block-laying switch engine 2', fillSimpleMap({ right: 30, bottom: 20, sq: true }, rleDecode('3obo$o$3boo$boobo$obobo!'))],
+  ['block-laying switch engine 3', fillSimpleMap({}, rleDecode('8ob5o3b3o6b7ob5o!'))],
   ['41140732', fillSimpleMap({ bottom: 48, right: 4, sq: true }, buildDigitMap('41140732'))],
   ['90', fillSimpleMap({ bottom: 5, right: 3, sq: true }, buildDigitMap('90'))],
   ['3207', fillSimpleMap({ top: 7 }, buildDigitMap('3207'))],
@@ -446,7 +449,6 @@ class Canvas {
     // private
     this.colorMgr = colorMgr;
     this.cellSize = 2;
-    this.bdColor = '#000';
     this.bgColor = '#222';
     this.fgColor = '#6f6';
     [this.canvas] = $('#grid');
@@ -463,19 +465,29 @@ class Canvas {
     const h = this.game.height;
     this.context.fillStyle = this.bgColor;
     this.context.fillRect(0, 0, pw, ph);
-    this.context.fillStyle = this.bdColor;
+    if (this.cellStep > 7) {
+      this.context.fillStyle = '#000';
+      for (let i = 1; i < w; ++i) {
+        this.context.fillRect(i * this.cellStep, 0, 1, ph);
+      }
+      for (let i = 1; i < h; ++i) {
+        this.context.fillRect(0, i * this.cellStep, pw, 1);
+      }
+    }
+    if (this.cellStep > 4) {
+      this.context.fillStyle = '#555';
+      for (let i = Math.floor((w % 10) / 2); i < w; i += 10) {
+        this.context.fillRect(i * this.cellStep, 1, 1, ph - 2);
+      }
+      for (let i = Math.floor((h % 10) / 2); i < h; i += 10) {
+        this.context.fillRect(1, i * this.cellStep, pw - 2, 1);
+      }
+    }
+    this.context.fillStyle = '#000';
     this.context.fillRect(0, 0, pw, 1);
     this.context.fillRect(0, ph - 1, pw, 1);
     this.context.fillRect(0, 0, 1, ph);
     this.context.fillRect(pw - 1, 0, 1, ph);
-    if (this.cellStep > 7) {
-      for (let i = 1; i < w; ++i) {
-        this.context.fillRect(i * this.cellStep, 0, 1, ph);
-      }
-      for (let j = 1; j < h; ++j) {
-        this.context.fillRect(0, j * this.cellStep, pw, 1);
-      }
-    }
   }
 
   update() {
@@ -579,25 +591,69 @@ class ColorMgr {
   }
 }
 
+const schedulers = [
+  {
+    name: 'native animation',
+    title: 'sync with your monitor, usually 60fps (requestAnimationFrame)',
+    f: (f) => {
+      const s = requestAnimationFrame(f);
+      return () => cancelAnimationFrame(s);
+    },
+  },
+  {
+    name: 'on idle',
+    title: 'requestIdleCallback',
+    f: (f) => {
+      const s = requestIdleCallback(f);
+      return () => cancelIdleCallback(s);
+    },
+  },
+  {
+    name: 'sleep 0',
+    title: 'setTimeout(f, 0) (throttled in modern browsers)',
+    f: (f) => {
+      const s = setTimeout(f, 0);
+      return () => clearTimeout(s);
+    },
+  },
+  {
+    name: 'sleep 0.1s',
+    title: 'setTimeout(f, 100)',
+    f: (f) => {
+      const s = setTimeout(f, 100);
+      return () => clearTimeout(s);
+    },
+  },
+  {
+    name: 'sleep 1s',
+    title: 'setTimeout(f, 1000)',
+    f: (f) => {
+      const s = setTimeout(f, 1000);
+      return () => clearTimeout(s);
+    },
+  },
+];
+
 class Runner {
   constructor(canvas) {
     this.canvas = canvas;
-    this.timerId = undefined;
+    this.canceler = undefined;
     // public
     this.statFrames = 0;
     this.statUpdated = 0;
     this.statCalcTime = 0;
     this.statDrawTime = 0;
+    this.scheduler = schedulers[0].f;
   }
 
-  step() {
+  step() { // private
     const res = this.canvas.step();
     this.statFrames += 1;
     this.statUpdated += res.updated;
     this.statCalcTime += res.calcTime;
     this.statDrawTime += res.drawTime;
     if (res.updated > 0) {
-      this.timerId = requestAnimationFrame(() => { this.step(); });
+      this.canceler = this.scheduler(() => { this.step(); });
     }
   }
 
@@ -607,7 +663,10 @@ class Runner {
   }
 
   stop() {
-    cancelAnimationFrame(this.timerId);
+    if (this.canceler) {
+      this.canceler();
+      this.canceler = undefined;
+    }
   }
 }
 
@@ -620,6 +679,12 @@ $(() => {
   g.update();
   g.fill(lifeMap);
   const r = new Runner(g);
+  (() => { // tricky cancelable delayed run
+    const s = setTimeout(() => {
+      r.run();
+    }, 2000);
+    r.canceler = () => clearTimeout(s); // oh. Set private attribute
+  })();
 
   setInterval(() => {
     $('#stat').html( // TODO: layout and legend
@@ -688,14 +753,48 @@ $(() => {
     });
   });
   $('#ctl_p_life').click(() => { r.stop(); g.fill(lifeMap); });
-  const ee = [];
-  for (let i = 0; i < fillFunctions.length; ++i) {
-    const p = fillFunctions[i];
-    const e = $('<button>').text(p[0]).click(() => {
-      r.stop();
-      g.fill(p[1]);
+
+  (() => {
+    const ee = [];
+    fillFunctions.forEach((p) => {
+      const e = $('<button>').text(p[0]).click(() => {
+        r.stop();
+        g.fill(p[1]);
+      });
+      ee.push(' ', e);
     });
-    ee.push(' ', e);
-  }
-  $('#ctl_p_life').after(ee);
+    $('#ctl_p_life').after(ee);
+  })();
+
+  (() => {
+    const ee = [];
+    schedulers.forEach((t) => {
+      ee.push(' ', $('<button>').text(t.name).prop('title', t.title).click(() => {
+        r.scheduler = t.f;
+      }));
+    });
+    $('#section-delay').after(ee);
+  })();
+
+  (() => {
+    const hotKeys = {};
+    $('[data-hot-key]').each((n, v) => {
+      const e = $(v);
+      const c = e.data('hot-key');
+      e.prop('title', `(${c.toUpperCase()})`);
+      const k = c.toLowerCase();
+      if (c[k]) {
+        throw new Error(`Hot key binding conflict on ${k}`);
+      }
+      hotKeys[c.toLowerCase()] = e;
+    });
+    $(window).keypress((ev) => {
+      const e = hotKeys[String.fromCharCode(ev.which).toLowerCase()];
+      if (e) {
+        e.click();
+      }
+    });
+  })();
+
+  window.onbeforeunload = () => 'Are you sure you want to navigate away?';
 });
