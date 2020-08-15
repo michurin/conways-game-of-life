@@ -557,7 +557,7 @@ class Canvas {
     this.context.fillStyle = this.fgColor;
     f(this.game.width, this.game.height).forEach((v) => {
       if (this.game.inverse(v.x, v.y) !== 1) {
-        throw new Error('Impossible. Bad example definition?');
+        console.warn('Bad example definition? Or area too narrow?');
       }
       this.context.fillRect(v.x * this.cellStep + 1, v.y * this.cellStep + 1, this.cellSize, this.cellSize);
     });
