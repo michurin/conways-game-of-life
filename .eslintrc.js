@@ -24,4 +24,29 @@ module.exports = {
       functions: 'never', // es2017
     }],
   },
+  overrides: [
+    {
+      files: ['main.js'],
+      globals: {
+        lifeMap: 'readonly',
+        fillFunctions: 'readonly',
+      }
+    }, {
+      files: ['examples.js'],
+      globals: {
+        fillSimpleMap: 'readonly',
+        rleDecode: 'readonly',
+        buildDigitMap: 'readonly',
+        lifeMap: 'readonly',
+      },
+      rules: {
+        'no-unused-vars': ['error', {'varsIgnorePattern': 'fillFunctions'}],
+      },
+    }, {
+      files: ['helpers.js'],
+      rules: {
+        'no-unused-vars': ['error', {'varsIgnorePattern': '(fillSimpleMap|rleDecode|buildDigitMap|lifeMap)'}],
+      }
+    }
+  ]
 };
