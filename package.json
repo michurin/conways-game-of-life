@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "dependencies": {},
   "devDependencies": {
-    "eslint": "^7.5.0",
+    "eslint": "^7.26.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
