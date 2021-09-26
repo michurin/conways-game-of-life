@@ -1,0 +1,13 @@
+name: CILint
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: stefanoeb/eslint-action@1.0.2
