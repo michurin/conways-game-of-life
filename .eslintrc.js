@@ -30,7 +30,7 @@ module.exports = {
       globals: {
         lifeMap: 'readonly',
         fillFunctions: 'readonly',
-      }
+      },
     }, {
       files: ['examples.js'],
       globals: {
@@ -40,13 +40,13 @@ module.exports = {
         lifeMap: 'readonly',
       },
       rules: {
-        'no-unused-vars': ['error', {'varsIgnorePattern': 'fillFunctions'}],
+        'no-unused-vars': ['error', { varsIgnorePattern: 'fillFunctions' }],
       },
     }, {
       files: ['helpers.js'],
       rules: {
-        'no-unused-vars': ['error', {'varsIgnorePattern': '(fillSimpleMap|rleDecode|buildDigitMap|lifeMap)'}],
-      }
-    }
-  ]
+        'no-unused-vars': ['error', { varsIgnorePattern: '(fillSimpleMap|rleDecode|buildDigitMap|lifeMap)' }],
+      },
+    },
+  ],
 };
