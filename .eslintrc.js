@@ -16,6 +16,7 @@ module.exports = {
     'max-len': ['error', { code: 200 }],
     'max-classes-per-file': ['error', 4],
     'no-restricted-properties': 'off', // es2016
+    'prefer-exponentiation-operator': 'off',
     'comma-dangle': ['error', {
       arrays: 'always-multiline',
       objects: 'always-multiline',
