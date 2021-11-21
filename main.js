@@ -356,16 +356,10 @@ $(() => {
   })();
 
   setInterval(() => {
-    $('#stat').html( // TODO: layout and legend
-      `FPS: ${r.statFrames
-      } CPU (calc/draw/idle): ${r.statCalcTime.toFixed(2)} / ${
-        r.statDrawTime.toFixed(2)} / ${
-        Math.max(0, Math.min(1000, (1000 - r.statCalcTime - r.statDrawTime))).toFixed(2)
-      }ms/s <div style="display: inline-block; background-color: #777; width: 100px; height: 10px; position: relative"><div style="position: absolute; top: 0; left: ${
-        Math.floor(r.statCalcTime / 10)}px; width: ${
-        Math.floor(r.statDrawTime / 10)}px; height: 10px; background-color: #000;"></div></div> AvgTime (calc/draw): ${
-        ((r.statCalcTime / r.statFrames) || 0).toFixed(2)} / ${
-        ((r.statDrawTime / r.statFrames) || 0).toFixed(2)}ms/frame UPS: ${r.statUpdated} TPU: ${((1000 * (r.statCalcTime / r.statUpdated)) || 0).toFixed(3)}&micro;s`
+    // TODO: just setInterval is oversimplifications: we have to align measurement interval to drawing intervals
+    $('#stat').html( // TODO: layout and legend, divisions by zero
+      // eslint-disable-next-line max-len
+      `FPS: ${r.statFrames} CPU (calc/draw/idle): ${r.statCalcTime.toFixed(2)} / ${r.statDrawTime.toFixed(2)} / ${Math.max(0, Math.min(1000, (1000 - r.statCalcTime - r.statDrawTime))).toFixed(2)}ms/s <div style="display: inline-block; background-color: #777; width: 100px; height: 10px; position: relative"><div style="position: absolute; top: 0; left: ${Math.floor(r.statCalcTime / 10)}px; width: ${Math.floor(r.statDrawTime / 10)}px; height: 10px; background-color: #000;"></div></div> AvgTime (calc/draw): ${((r.statCalcTime / r.statFrames) || 0).toFixed(2)} / ${((r.statDrawTime / r.statFrames) || 0).toFixed(2)}ms/frame UPS: ${r.statUpdated} TPU: ${((1000 * (r.statCalcTime / r.statUpdated)) || 0).toFixed(3)}&micro;s`
     );
     r.statFrames = 0;
     r.statUpdated = 0;
@@ -394,14 +388,14 @@ $(() => {
   $('#ctl_step').click(() => { r.stop(); g.step(); });
   $('#ctl_clear').click(() => { r.stop(); g.reset(); });
 
-  $('[data-tail-mode]').each((n, v) => {
+  $('[data-tail-mode]').each((_, v) => {
     const e = $(v);
     const m = parseInt(e.data('tail-mode'), 10);
     e.click(() => {
       cmgr.setMode(m);
     });
   });
-  $('[data-size-x]').each((n, v) => {
+  $('[data-size-x]').each((_, v) => {
     const e = $(v);
     const fx = parseFloat(e.data('size-x'));
     const fy = parseFloat(e.data('size-y'));
@@ -412,7 +406,7 @@ $(() => {
       g.update();
     });
   });
-  $('[data-cell-size]').each((n, v) => {
+  $('[data-cell-size]').each((_, v) => {
     const e = $(v);
     const s = parseInt(e.data('cell-size'), 10);
     e.click(() => {
@@ -447,7 +441,7 @@ $(() => {
 
   (() => {
     const hotKeys = {};
-    $('[data-hot-key]').each((n, v) => {
+    $('[data-hot-key]').each((_, v) => {
       const e = $(v);
       const c = e.data('hot-key');
       e.prop('title', `(${c.toUpperCase()})`);
