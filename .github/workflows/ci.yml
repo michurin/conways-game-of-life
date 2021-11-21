@@ -9,13 +9,17 @@ jobs:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - uses: actions/checkout@v2
       - name: Install modules
         run: npm install
       - name: Check environment
         run: |
           node --version
+          npm --version
           npx eslint --version
       - name: Run ESLint
-        run: npx eslint . --ext .js
+        run: npm test
 
