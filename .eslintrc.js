@@ -5,7 +5,7 @@ module.exports = {
     jquery: true,
   },
   extends: [
-    'airbnb',
+    'airbnb/base',
   ],
   parserOptions: {
     ecmaVersion: 6,
