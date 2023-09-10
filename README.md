@@ -1,6 +1,6 @@
 # Conway's Game of Life
 
-[![Build Status](https://travis-ci.org/michurin/conways-game-of-life.svg?branch=master)](https://travis-ci.org/michurin/conways-game-of-life)
+[![Build Status](https://github.com/michurin/conways-game-of-life/actions/workflows/ci.yml/badge.svg)](https://github.com/michurin/conways-game-of-life/actions/workflows/ci.yml)
 
 [Online demo](https://michurin.github.io/conways-game-of-life/)
 
