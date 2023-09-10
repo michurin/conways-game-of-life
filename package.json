@@ -4,16 +4,21 @@
   "description": "",
   "main": "main.js",
   "devDependencies": {
-    "eslint": "^8.2.0",
-    "eslint-config-airbnb": "^19.0.0",
-    "eslint-plugin-import": "^2.24.2",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.26.0",
-    "eslint-plugin-react-hooks": "^4.2.0"
+    "eslint": "^8.36.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0"
   },
   "scripts": {
     "test": "eslint . --ext .js"
   },
-  "author": "",
-  "license": "ISC"
+  "homepage": "https://github.com/michurin/conways-game-of-life",
+  "author": "Alexey Michurin <a.michurin@gmail.com> (https://michurin.github.io/)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michurin/conways-game-of-life.git"
+  }
 }
